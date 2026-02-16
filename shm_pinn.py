@@ -19,9 +19,11 @@ class PINN(nn.Module):
     def __init__(self):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(1, 32), nn.Tanh(),
-            nn.Linear(32, 32), nn.Tanh(),
-            nn.Linear(32, 1)
+            nn.Linear(1, 128), nn.Tanh(),
+            nn.Linear(128, 128), nn.Tanh(),
+            nn.Linear(128, 128), nn.Tanh(),
+            nn.Linear(128, 128), nn.Tanh(),
+            nn.Linear(128, 1)
         )
 
     def forward(self, t):
@@ -33,7 +35,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 t_physics = torch.linspace(0, 10, 2000).view(-1, 1).requires_grad_(True)
 
 # 4. Training Loop
-for epoch in range(15000):
+for epoch in range(30000):
     optimizer.zero_grad()
     
     # Loss 1: Boundary/Initial Conditions (t=0, u=1, u'=0)
@@ -51,7 +53,7 @@ for epoch in range(15000):
     loss_phs = torch.mean(residual**2)
     
     # Total Loss
-    loss = loss_bc + 0.1 * loss_phs # Weighting physics slightly less to help convergence
+    loss = loss_bc + 0.1*loss_phs # Weighting physics slightly less to help convergence
     loss.backward()
     optimizer.step()
     
